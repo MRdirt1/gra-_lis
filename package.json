@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    /* ...existing dependencies... */
+    "@sentry/netlify-build-plugin": "^1.1.1"
+  }
+}
