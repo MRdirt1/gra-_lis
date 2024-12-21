@@ -3,40 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <title>pan lis</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-image: url(Foxes_White_background_Ginger_color_Glance_576113_1920x1080.jpg);
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .button {
+            background-color: yellow;
+            color: black;
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 20px;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: lightblue;
+        }
+        .button a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+    </style>
 </head>
-
-<style>
-    body {
-      font-family: sans-serif;
-      background-image: url(Foxes_White_background_Ginger_color_Glance_576113_1920x1080.jpg);
-    }
-    
-    .button {
-      background-color: yellow;
-      color: white;
-      font-size: 16px;
-      padding: 10px 20px;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      border-radius: 20px;
-      margin-right: 20px;
-    }
-    
-    .button:hover {
-      background-color: lightblue;
-    }
-</style>
-
 <body>
-    <h1><p style="text-align: center;">Gdy dotarliście do domu okazało się że przy tym jeziorze zostawiliście kanapki które zrobił Pan Lis na drogę... 
-      uznałeś że robisz Lisiczce coś lepszego! wybierz co jej zrobisz!<br></p></h1>
-    <ul>
-        <div style="display: flex; justify-content: center; align-items: center;">
-        <button class="button"><a href="page10.html" style="text-decoration: none; color: black;"> Nugettsy z kurczaka</a></button>
-        <button class="button"><a href="page10.html" style="text-decoration: none; color: black;">Spaghetti</a></button>
-        <button class="button"><a href="page10.html" style="text-decoration: none; color: black;">Pierogi</a></button>
-        </div>
-    </ul>
+    <h1>Gdy dotarliście do domu okazało się że przy tym jeziorze zostawiliście kanapki które zrobił Pan Lis na drogę... uznałeś że robisz Lisiczce coś lepszego! wybierz co jej zrobisz!</h1>
+    <div class="button-container">
+        <button class="button"><a href="page10.html">Nugettsy z kurczaka</a></button>
+        <button class="button"><a href="page10.html">Spaghetti</a></button>
+        <button class="button"><a href="page10.html">Pierogi</a></button>
+    </div>
 </body>
 </html>

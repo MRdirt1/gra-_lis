@@ -2,47 +2,732 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>pan lis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pan Lis - Przygoda</title>
+    <!-- Add CSS files -->
+    <link rel="stylesheet" href="effects.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        :root {
+            --forest-color: #2d5a27;
+            --house-color: #8b4513;
+            --night-color: #191970;
+            --danger-color: #8b0000;
+            --cozy-color: #daa520;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a1a1a;
+            color: #333;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .scene-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: all 1s ease;
+            z-index: 1;
+        }
+
+        /* Enhanced scene backgrounds */
+        .forest-bg {
+            background: 
+                linear-gradient(rgba(45, 90, 39, 0.7), rgba(0, 0, 0, 0.4)),
+                url('images/backgrounds/forest-bg.jpg') center/cover fixed;
+        }
+
+        .house-bg {
+            background: 
+                linear-gradient(rgba(139, 69, 19, 0.3), rgba(0, 0, 0, 0.2)),
+                url('images/backgrounds/cozy-house.jpg') center/cover fixed;
+        }
+
+        .night-bg {
+            background: 
+                linear-gradient(rgba(25, 25, 112, 0.8), rgba(0, 0, 0, 0.6)),
+                url('images/backgrounds/night-forest.jpg') center/cover fixed;
+        }
+
+        .danger-bg {
+            background: 
+                linear-gradient(rgba(139, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
+                url('images/backgrounds/danger-scene.jpg') center/cover fixed;
+        }
+
+        .game-container {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(0);
+            transition: all 0.5s ease;
+        }
+
+        .game-title {
+            font-size: 3em;
+            color: var(--house-color);
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .story-text {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .choice-button {
+            min-width: 200px;
+            padding: 15px 25px;
+            font-size: 1em;
+            font-weight: 600;
+            color: #fff;
+            background: var(--house-color);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .choice-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Scene-specific styles */
+        .forest-scene .story-text {
+            border-left: 5px solid var(--forest-color);
+        }
+
+        .house-scene .story-text {
+            border-left: 5px solid var(--house-color);
+        }
+
+        .night-scene .story-text {
+            border-left: 5px solid var(--night-color);
+            color: #191970;
+        }
+
+        .danger-scene .story-text {
+            border-left: 5px solid var(--danger-color);
+        }
+
+        .cozy-scene .story-text {
+            border-left: 5px solid var(--cozy-color);
+        }
+
+        /* Weather effects */
+        .rain {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 100%);
+            animation: rain 0.8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rain {
+            0% { background-position: 0 0; }
+            100% { background-position: -20px 40px; }
+        }
+
+        /* Scene transitions */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .game-container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            .game-title {
+                font-size: 2em;
+            }
+
+            .story-text {
+                font-size: 1.1em;
+            }
+
+            .choice-button {
+                min-width: 150px;
+            }
+        }
+
+        /* Add new styles for ending screens */
+        .ending-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            color: white;
+            z-index: 100;
+        }
+
+        .ending-title {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .ending-description {
+            font-size: 1.5em;
+            max-width: 600px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .play-again-button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .play-again-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
-
-<style>
-    body {
-      font-family: sans-serif;
-      background-image: url(Foxes_White_background_Ginger_color_Glance_576113_1920x1080.jpg);
-    }
-    
-    .button {
-      background-color: yellow;
-      color: white;
-      font-size: 40px;
-      padding: 10px 20px;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      border-radius: 20px;
-      margin-right: 20px;
-      height: 80px;
-      width: 160px;
-      font: bold;
-    }
-    
-    .button:hover {
-      background-color: lightblue;
-    }
-
-    .dupa{
-        font-size: 500%;
-    }
-</style>
-
 <body>
-    <h1><p style="text-align: center;" class="dupa">Gra pan lis</p></h1>
+    <!-- Add scene effects containers -->
+    <div id="weather-effects" class="weather-container"></div>
+    <div id="scene-background" class="scene-overlay"></div>
+    <div class="game-container">
+        <h1 class="game-title" id="gameTitle">Gra Pan Lis</h1>
+        <p class="story-text" id="storyText"></p>
+        <div class="button-container" id="choiceButtons"></div>
+    </div>
 
-    <ul>
-        <div style="display: flex; justify-content: center; align-items: center;">
-        <button class="button"><a href="pytania\page1.html" style="text-decoration: none; color: black;"><b>start</b></a></button>
-        </div>
-    
-    </ul>
+    <script>
+        const gameStates = {
+            start: {
+                text: "Witaj w grze Pan Lis! Jesteś zmęczonym wędrowcem, który zbierał grzyby w lesie. Pogoda się pogarsza...",
+                choices: [
+                    { text: "Rozpocznij przygodę", nextState: "forest_intro" }
+                ],
+                sceneType: "forest-scene"
+            },
+            forest_intro: {
+                text: "Ciemne chmury zbierają się nad lasem. Twój koszyk jest pełen grzybów, ale zaczynasz tracić orientację...",
+                choices: [
+                    { text: "Spróbuj odnaleźć drogę", nextState: "lost_path" },
+                    { text: "Szukaj schronienia", nextState: "find_shelter" }
+                ],
+                sceneType: "forest-scene"
+            },
+            lost_path: {
+                text: "Próbujesz odnaleźć drogę, ale las wydaje się coraz gęstszy. Zaczyna padać...",
+                choices: [
+                    { text: "Zawróć i szukaj schronienia", nextState: "find_shelter" },
+                    { text: "Idź dalej w las", nextState: "deep_forest_danger" }
+                ],
+                sceneType: "forest-scene"
+            },
+            deep_forest_danger: {
+                text: "Las staje się niebezpiecznie ciemny, a deszcz coraz silniejszy. Słyszysz dziwne odgłosy...",
+                choices: [
+                    { text: "Zawróć natychmiast!", nextState: "find_shelter" },
+                    { text: "Sprawdź źródło dźwięków", nextState: "investigate_sounds" }
+                ],
+                sceneType: "danger-scene"
+            },
+            investigate_sounds: {
+                text: "Podchodzisz w kierunku szelestów. W świetle księżyca dostrzegasz dziwną kolekcję grzybów. Niektóre przypominają kształtem... ludzi? Nagle słyszysz za sobą głos Pana Lisa: 'Widzę, że znalazłeś moją kolekcję poprzednich opiekunów.'",
+                choices: [
+                    { text: "Próbuj uciec", nextState: "failed_escape" },
+                    { text: "Zapytaj o wyjaśnienia", nextState: "dark_explanation" }
+                ],
+                sceneType: "danger-scene"
+            },
+            failed_escape: {
+                text: "Próbujesz uciec, ale potykasz się w ciemności. Ostatnie co widzisz to Pan Lis stojący nad tobą z tajemniczym proszkiem w łapach. 'Będziesz pięknym grzybkiem w mojej kolekcji...'",
+                choices: [
+                    { text: "TRAGICZNE ZAKOŃCZENIE: DOŁĄCZASZ DO KOLEKCJI - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "danger-scene"
+            },
+            dark_explanation: {
+                text: "Pan Lis wyjaśnia, że zamienia w grzyby tylko tych opiekunów, którzy źle traktowali jego siostrę. 'A ty... jak się zachowasz?'",
+                choices: [
+                    { text: "Obiecaj dobrą opiekę", nextState: "care_path" },
+                    { text: "Spróbuj go zaatakować", nextState: "tragic_ending" }
+                ],
+                sceneType: "danger-scene"
+            },
+            find_shelter: {
+                text: "W oddali dostrzegasz drewniany dom. Światło w oknach sugeruje, że ktoś tam mieszka.",
+                choices: [
+                    { text: "Zapukaj grzecznie", nextState: "polite_knock" },
+                    { text: "Zajrzyj przez okno", nextState: "window_peek" },
+                    { text: "Wejdź bez pukania", nextState: "rude_entry" }
+                ],
+                sceneType: "house-scene"
+            },
+            window_peek: {
+                text: "Przez okno widzisz przytulne wnętrze i lisa czytającego książkę przy kominku. Wygląda przyjaźnie.",
+                choices: [
+                    { text: "Zapukaj do drzwi", nextState: "polite_knock" },
+                    { text: "Obserwuj dalej", nextState: "caught_peeking" }
+                ],
+                sceneType: "house-scene"
+            },
+            caught_peeking: {
+                text: "Pan Lis zauważył cię przez okno! Podchodzi do drzwi z zaciekawieniem.",
+                choices: [
+                    { text: "Przeproś i wyjaśnij sytuację", nextState: "polite_explanation" },
+                    { text: "Uciekaj zawstydzony", nextState: "game_over_forest" }
+                ],
+                sceneType: "house-scene"
+            },
+            polite_knock: {
+                text: "Pan Lis otwiera drzwi. 'O rety! Przemokłeś do suchej nitki! Wejdź, właśnie parzyłem herbatę.'",
+                choices: [
+                    { text: "Przyjmij zaproszenie z wdzięcznością", nextState: "warm_welcome" },
+                    { text: "Poproś tylko o wskazówki do miasta", nextState: "directions_only" }
+                ],
+                sceneType: "house-scene"
+            },
+            warm_welcome: {
+                text: "Przy herbacie i ciastkach Pan Lis opowiada o sobie. Mieszka tu z młodszą siostrą, którą się opiekuje.",
+                choices: [
+                    { text: "Zapytaj o jego siostrę", nextState: "sister_story" },
+                    { text: "Opowiedz o swojej przygodzie", nextState: "share_story" }
+                ],
+                sceneType: "cozy-scene"
+            },
+            sister_story: {
+                text: "Pan Lis opowiada o swojej 5-letniej siostrze. 'Niestety, poprzedni opiekunowie... zniknęli w tajemniczych okolicznościach.' - wzdycha niepokojąco.",
+                choices: [
+                    { text: "Zaoferuj pomoc w opiece", nextState: "care_path" },
+                    { text: "Zapytaj o poprzednich opiekunów", nextState: "mystery_path" },
+                    { text: "Wymów się i wyjdź", nextState: "escape_path" }
+                ],
+                sceneType: "cozy-scene"
+            },
+            care_path: {
+                text: "Postanawiasz pomóc w opiece nad małą lisiczką. Pan Lis wydaje się szczęśliwy, choć czasem zauważasz dziwne zachowania...",
+                choices: [
+                    { text: "Obserwuj uważnie sytuację", nextState: "investigation" },
+                    { text: "Całkowicie się zaangażuj", nextState: "happy_path" },
+                    { text: "Zachowaj dystans", nextState: "neutral_path" }
+                ],
+                sceneType: "cozy-scene"
+            },
+            mystery_path: {
+                text: "Pan Lis dziwnie się uśmiecha: 'Ciekawość to pierwszy stopień do... Może lepiej nie pytaj o takie rzeczy.'",
+                choices: [
+                    { text: "Uciekaj natychmiast!", nextState: "escape_ending" },
+                    { text: "Zostań mimo obaw", nextState: "dark_path" },
+                    { text: "Udaj, że nic nie zauważyłeś", nextState: "neutral_path" }
+                ],
+                sceneType: "cozy-scene"
+            },
+            investigation: {
+                text: "Prowadząc małe śledztwo odkrywasz, że poprzedni opiekunowie zostali zamienieni w... grzyby w lesie!",
+                choices: [
+                    { text: "Konfrontuj Pana Lisa", nextState: "tragic_ending" },
+                    { text: "Spróbuj uciec", nextState: "escape_ending" },
+                    { text: "Zaakceptuj sytuację", nextState: "dark_family" }
+                ],
+                sceneType: "danger-scene"
+            },
+            happy_path: {
+                text: "Twoja szczera troska i zaangażowanie sprawiły, że Pan Lis i jego siostra naprawdę się do ciebie przywiązali.",
+                choices: [
+                    { text: "Kontynuuj", nextState: "ending_faithful_guardian" }
+                ],
+                sceneType: "cozy-scene"
+            },
+            ending_faithful_guardian: {
+                text: "Wierny Opiekun",
+                description: "Zostałeś honorowym członkiem rodziny Lisa, zyskując nie tylko zaufanie, ale i prawdziwą miłość rodzinną.",
+                background: "endings/faithful_guardian.jpg",
+                type: "happy"
+            },
+            neutral_path: {
+                text: "Zachowujesz bezpieczny dystans. Pomagasz czasem w opiece, ale nie angażujesz się za bardzo. Po jakimś czasie żegnasz się i odchodzisz jako dobry znajomy.",
+                choices: [
+                    { text: "NEUTRALNE ZAKOŃCZENIE - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "neutral-ending"
+            },
+            tragic_ending: {
+                text: "Pan Lis patrzy na ciebie ze smutkiem: 'Szkoda... byłeś takim dobrym opiekunem. Ale teraz dołączysz do naszej grzybowej kolekcji!'",
+                choices: [
+                    { text: "Kontynuuj", nextState: "ending_mushroom_collection" }
+                ],
+                sceneType: "danger-scene"
+            },
+            ending_mushroom_collection: {
+                text: "Grzyb w Kolekcji",
+                description: "Dołączyłeś do tajemniczej kolekcji grzybów Pana Lisa. Twoja historia staje się przestrogą dla przyszłych opiekunów.",
+                background: "endings/mushroom_collection.jpg",
+                type: "tragic"
+            },
+            escape_ending: {
+                text: "Udaje ci się uciec z domu Pana Lisa. Nikt nie wierzy w twoją historię o magicznym lisie zamieniającym ludzi w grzyby...",
+                choices: [
+                    { text: "ZAKOŃCZENIE UCIECZKI - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "danger-scene"
+            },
+            dark_family: {
+                text: "Akceptujesz mroczną naturę rodziny Lisa. Stajesz się ich sojusznikiem w zamienianiu nieodpowiednich opiekunów w grzyby...",
+                choices: [
+                    { text: "MROCZNE ZAKOŃCZENIE - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "danger-scene"
+            },
+            page1: {
+                text: "Postanowiłeś wybrać się na grzyby. Znalazłeś cały koszyk grzybów, ale się zgubiłeś. Zaczęło mocno padać. Po godzinie szukania jakiegokolwiek schronienia zobaczyłeś piękny, drewniany dom. Co teraz zrobisz?",
+                choices: [
+
+                { text: "Pójdę szukać innego schronienia", nextState: "lost_in_forest" },
+                    { text: "Zapukam w drzwi", nextState: "polite_entry" },
+                    { text: "Wbijam do domu bez pukania", nextState: "rude_entry" }
+                ],
+                sceneType: "forest-scene"
+            },
+            lost_in_forest: {
+                text: "Postanowiłeś szukać dalej. Niestety, las okazał się zbyt niebezpieczny podczas ulewy...",
+                choices: [
+                    { text: "Spróbuj ponownie", nextState: "start" }
+                ],
+                sceneType: "danger-scene"
+            },
+            polite_entry: {
+                text: "Pan Lis docenił twoje dobre maniery! Oferuje ci nie tylko schronienie, ale także ciepłą herbatę i domowe ciasteczka.",
+                choices: [
+                    { text: "Przyjmij gościnność", nextState: "good_guest_path" }
+                ],
+                sceneType: "house-scene"
+            },
+            rude_entry: {
+                text: "Pan Lis jest zaskoczony twoim wtargnięciem, ale rozumie twoją desperację. Oferuje schronienie, choć zachowuje dystans.",
+                choices: [
+                    { text: "Przeproś za wtargnięcie", nextState: "redemption_path" },
+                    { text: "Zachowuj się jakby nic się nie stało", nextState: "tension_path" }
+                ],
+                sceneType: "house-scene"
+            },
+            good_guest_path: {
+                text: "Twoje dobre maniery sprawiły, że Pan Lis czuje się przy tobie komfortowo. Opowiada ci o swojej młodszej siostrze.",
+                choices: [
+                    { text: "Zaoferuj pomoc w opiece", nextState: "trusted_guardian" },
+                    { text: "Grzecznie słuchaj", nextState: "friendly_guest" }
+                ],
+                sceneType: "cozy-scene"
+            },
+            redemption_path: {
+                text: "Pan Lis docenia twoją szczerość i przeprosiny. Atmosfera się rozluźnia.",
+                choices: [
+                    { text: "Pokaż wdzięczność pomocą", nextState: "trusted_guardian" },
+                    { text: "Zachowaj dystans", nextState: "polite_stranger" }
+                ],
+                sceneType: "cozy-scene"
+            },
+            tension_path: {
+                text: "Twoja postawa sprawia, że Pan Lis jest ostrożny. Pozwala ci zostać, ale nie ufa ci w pełni.",
+                choices: [
+                    { text: "Spróbuj naprawić relację", nextState: "redemption_path" },
+                    { text: "Pozostań obojętny", nextState: "unwanted_guest" }
+                ],
+                sceneType: "house-scene"
+            },
+            trusted_guardian: {
+                text: "Zostałeś zaufanym opiekunem młodszej siostry Pana Lisa. Twoja pomoc i troska sprawiły, że stałeś się częścią rodziny!",
+                choices: [
+                    { text: "Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "cozy-scene"
+            },
+            friendly_guest: {
+                text: "Jesteś mile widzianym gościem w domu Pana Lisa. Choć nie jesteś tak blisko jak rodzina, zawsze możesz liczyć na jego pomoc.",
+                choices: [
+                    { text: "Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "cozy-scene"
+            },
+            polite_stranger: {
+                text: "Pan Lis szanuje twój dystans. Pozwala ci zostać do końca ulewy, po czym żegnacie się jako znajomi.",
+                choices: [
+                    { text: "Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "neutral-ending"
+            },
+            unwanted_guest: {
+                text: "Twoja obojętność sprawia, że Pan Lis prosi cię o opuszczenie domu gdy tylko ustanie ulewa...",
+                choices: [
+                    { text: "Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "house-scene"
+            },
+            directions_only: {
+                text: "Pan Lis pokazuje ci drogę do miasta. Wyczuwasz jego rozczarowanie twoją odmową gościny. Odchodzisz w deszczu...",
+                choices: [
+                    { text: "ZAKOŃCZENIE: ODMOWA GOŚCINY - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "neutral-ending"
+            },
+
+            share_story: {
+                text: "Opowiadasz o swojej przygodzie w lesie. Pan Lis słucha z zainteresowaniem, po czym proponuje ci dłuższy pobyt...",
+                choices: [
+                    { text: "Przyjmij propozycję", nextState: "care_path" },
+                    { text: "Odmów grzecznie", nextState: "polite_departure" }
+                ],
+                sceneType: "cozy-scene"
+            },
+
+            polite_departure: {
+                text: "Dziękujesz za gościnę i zbierasz się do wyjścia. Pan Lis życzy ci bezpiecznej podróży.",
+                choices: [
+                    { text: "ZAKOŃCZENIE: KRÓTKA WIZYTA - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "neutral-ending"
+            },
+
+            escape_path: {
+                text: "Wymyślasz wymówkę i próbujesz się wymknąć. Pan Lis patrzy na ciebie podejrzliwie...",
+                choices: [
+                    { text: "Uciekaj szybko!", nextState: "escape_ending" },
+                    { text: "Zmień zdanie i zostań", nextState: "suspicious_stay" }
+                ],
+                sceneType: "danger-scene"
+            },
+
+            suspicious_stay: {
+                text: "Pan Lis zauważa twoje wahanie. Od tej pory czujesz na sobie jego czujne spojrzenie...",
+                choices: [
+                    { text: "Próbuj odzyskać zaufanie", nextState: "redemption_path" },
+                    { text: "Planuj potajemną ucieczkę", nextState: "secret_escape" }
+                ],
+                sceneType: "danger-scene"
+            },
+
+            secret_escape: {
+                text: "W nocy próbujesz się wymknąć, ale Pan Lis już na ciebie czeka przy drzwiach...",
+                choices: [
+                    { text: "TRAGICZNE ZAKOŃCZENIE - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "danger-scene"
+            },
+
+            dark_path: {
+                text: "Mimo obaw zostajesz. Z czasem odkrywasz mroczne sekrety rodziny Lisa, ale jest już za późno...",
+                choices: [
+                    { text: "MROCZNE ZAKOŃCZENIE: BRAK ODWROTU - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "danger-scene"
+            },
+
+            polite_explanation: {
+                text: "Przepraszasz za podglądanie i wyjaśniasz swoją sytuację. Pan Lis docenia twoją szczerość.",
+                choices: [
+                    { text: "Przyjmij zaproszenie do środka", nextState: "warm_welcome" },
+                    { text: "Poproś tylko o wskazówki", nextState: "directions_only" }
+                ],
+                sceneType: "house-scene"
+            },
+
+            game_over_forest: {
+                text: "Zgubiłeś się w ciemnym lesie. Deszcz zaciera twoje ślady, a dziwne dźwięki zbliżają się...",
+                choices: [
+                    { text: "TRAGICZNE ZAKOŃCZENIE: ZGUBA - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "danger-scene"
+            },
+
+            night_sounds: {
+                text: "Nocne krzyki okazują się być głosami poprzednich opiekunów zamienionych w grzyby. Ostrzegają cię przed losem, który może cię spotkać...",
+                choices: [
+                    { text: "Uciekaj natychmiast", nextState: "night_escape" },
+                    { text: "Zostań i dowiedz się więcej", nextState: "mystery_investigation" }
+                ],
+                sceneType: "night-scene"
+            },
+
+            night_escape: {
+                text: "W panice wybiegasz w noc. Błądzisz po lesie, ale ostatecznie udaje ci się znaleźć drogę do miasta. Nikt jednak nie wierzy w twoją historię...",
+                choices: [
+                    { text: "ZAKOŃCZENIE: UCIECZKA W NOC - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "night-scene"
+            },
+
+            unwanted_guest: {
+                text: "Twoja obojętna postawa sprawia, że Pan Lis prosi cię o opuszczenie domu. Wracasz w deszcz i mrok...",
+                choices: [
+                    { text: "ZAKOŃCZENIE: WYPROSZONY GOŚĆ - Zagraj ponownie", nextState: "start" }
+                ],
+                sceneType: "house-scene"
+            }
+        };
+
+        function updateGame(state) {
+            if (gameStates[state].type === 'ending') {
+                // Create ending screen
+                const endingScreen = document.createElement('div');
+                endingScreen.className = 'ending-screen';
+                endingScreen.style.backgroundImage = `url(${gameStates[state].background})`;
+
+                const title = document.createElement('h1');
+                title.className = 'ending-title';
+                title.textContent = gameStates[state].text;
+
+                const description = document.createElement('p');
+                description.className = 'ending-description';
+                description.textContent = gameStates[state].description;
+
+                const playAgain = document.createElement('button');
+                playAgain.className = 'play-again-button';
+                playAgain.textContent = 'Zagraj ponownie';
+                playAgain.onclick = () => {
+                    document.body.removeChild(endingScreen);
+                    updateGame('start');
+                };
+
+                endingScreen.appendChild(title);
+                endingScreen.appendChild(description);
+                endingScreen.appendChild(playAgain);
+                document.body.appendChild(endingScreen);
+                return;
+            }
+
+            const container = document.querySelector('.game-container');
+            const storyText = document.querySelector('.story-text');
+            
+            // Reset classes
+            container.className = 'game-container';
+            
+            // Add scene-specific class
+            if (gameStates[state].sceneType) {
+                storyText.className = `story-text ${gameStates[state].sceneType}`;
+            }
+
+            // Add ending-specific class if applicable
+            if (state.includes('happy') || state === 'trusted_guardian') {
+                container.classList.add('happy-ending');
+            } else if (state.includes('tragic') || state === 'game_over') {
+                container.classList.add('tragic-ending');
+            } else if (state.includes('neutral') || state === 'polite_stranger') {
+                container.classList.add('neutral-ending');
+            }
+
+            document.getElementById('storyText').textContent = gameStates[state].text;
+            const buttonContainer = document.getElementById('choiceButtons');
+            buttonContainer.innerHTML = '';
+            
+            gameStates[state].choices.forEach(choice => {
+                const button = document.createElement('button');
+                button.className = 'choice-button';
+                button.textContent = choice.text;
+                button.onclick = () => updateGame(choice.nextState);
+                buttonContainer.appendChild(button);
+            });
+
+            // Update background based on scene type
+            const sceneBackground = document.getElementById('scene-background');
+            sceneBackground.className = 'scene-overlay';
+            
+            switch(gameStates[state].sceneType) {
+                case 'forest-scene':
+                    sceneBackground.classList.add('forest-bg');
+                    if (state.includes('rain')) {
+                        sceneBackground.innerHTML = '<div class="rain"></div>';
+                    }
+                    break;
+                case 'house-scene':
+                    sceneBackground.classList.add('house-bg');
+                    break;
+                case 'night-scene':
+                    sceneBackground.classList.add('night-bg');
+                    break;
+                // Add more scene types...
+            }
+
+            // Update scene effects
+            const weatherEffects = document.getElementById('weather-effects');
+            weatherEffects.innerHTML = '';
+
+            // Add appropriate effects based on scene type
+            switch(gameStates[state].sceneType) {
+                case 'forest-scene':
+                    sceneBackground.classList.add('forest-bg');
+                    if (state.includes('rain')) {
+                        weatherEffects.innerHTML = '<div class="rain"></div><div class="fog"></div>';
+                    }
+                    break;
+                case 'house-scene':
+                case 'cozy-scene':
+                    sceneBackground.classList.add('house-bg');
+                    weatherEffects.innerHTML = '<div class="firelight"></div>';
+                    break;
+                case 'night-scene':
+                    sceneBackground.classList.add('night-bg');
+                    weatherEffects.innerHTML = '<div class="moonlight"></div>';
+                    break;
+                case 'danger-scene':
+                    sceneBackground.classList.add('danger-bg');
+                    if (state.includes('escape')) {
+                        weatherEffects.innerHTML = '<div class="rain"></div><div class="fog"></div>';
+                    }
+                    break;
+            }
+        }
+
+        // Start the game
+        updateGame('start');
+    </script>
 </body>
 </html>
