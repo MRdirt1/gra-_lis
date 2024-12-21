@@ -39,3 +39,19 @@
     background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.2), transparent 70%);
     pointer-events: none;
 }
+
+/* Mobile-specific effect adjustments */
+@media (max-width: 768px) and (pointer: coarse) {
+    .fog, .firelight, .moonlight {
+        will-change: transform, opacity;
+        transform: translateZ(0);
+    }
+
+    .firelight {
+        background: radial-gradient(circle at center, rgba(255, 160, 0, 0.15), transparent 60%);
+    }
+
+    .moonlight {
+        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.15), transparent 60%);
+    }
+}

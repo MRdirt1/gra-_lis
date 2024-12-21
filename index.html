@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pan Lis - Przygoda</title>
     <!-- Add CSS files -->
     <link rel="stylesheet" href="effects.css">
@@ -44,25 +44,25 @@
         .forest-bg {
             background: 
                 linear-gradient(rgba(45, 90, 39, 0.7), rgba(0, 0, 0, 0.4)),
-                url('images/backgrounds/forest-bg.jpg') center/cover fixed;
+                url('./images/backgrounds/forest-bg.jpg') center/cover fixed;
         }
 
         .house-bg {
             background: 
                 linear-gradient(rgba(139, 69, 19, 0.3), rgba(0, 0, 0, 0.2)),
-                url('images/backgrounds/cozy-house.jpg') center/cover fixed;
+                url('./images/backgrounds/cozy-house.jpg') center/cover fixed;
         }
 
         .night-bg {
             background: 
                 linear-gradient(rgba(25, 25, 112, 0.8), rgba(0, 0, 0, 0.6)),
-                url('images/backgrounds/night-forest.jpg') center/cover fixed;
+                url('./images/backgrounds/night-forest.jpg') center/cover fixed;
         }
 
         .danger-bg {
             background: 
                 linear-gradient(rgba(139, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
-                url('images/backgrounds/danger-scene.jpg') center/cover fixed;
+                url('./images/backgrounds/danger-scene.jpg') center/cover fixed;
         }
 
         .game-container {
@@ -236,6 +236,108 @@
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
         }
+
+        /* Add scene transition styles */
+        .scene-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .scene-transition.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Scene-specific transitions */
+        .transition-forest {
+            background: linear-gradient(to right, #2d5a27, transparent);
+        }
+
+        .transition-house {
+            background: linear-gradient(to right, #8b4513, transparent);
+        }
+
+        .transition-night {
+            background: linear-gradient(to right, #191970, transparent);
+        }
+
+        .transition-danger {
+            background: linear-gradient(to right, #8b0000, transparent);
+        }
+
+        /* Animate scene changes */
+        @keyframes sceneChange {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .game-container.changing-scene {
+            animation: sceneChange 1s ease-in-out;
+        }
+
+        /* Mobile-specific styles - only apply when mobile device is detected */
+        @media (max-width: 768px) and (pointer: coarse) {
+            .game-container {
+                margin: 0;
+                padding: 15px;
+                width: 100%;
+                min-height: 100vh;
+                border-radius: 0;
+            }
+
+            .game-title {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+            }
+
+            .story-text {
+                font-size: 1em;
+                padding: 15px;
+                margin-bottom: 20px;
+                line-height: 1.5;
+            }
+
+            .button-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .choice-button {
+                width: 100%;
+                min-height: 44px; /* Better touch target */
+                padding: 12px 20px;
+                font-size: 0.9em;
+            }
+
+            .ending-screen {
+                padding: 20px;
+            }
+
+            .ending-title {
+                font-size: 2em;
+            }
+
+            .ending-description {
+                font-size: 1.1em;
+                padding: 0 15px;
+            }
+        }
+
+        /* iOS-specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            .game-container {
+                min-height: -webkit-fill-available;
+            }
+        }
     </style>
 </head>
 <body>
@@ -391,7 +493,7 @@
             ending_faithful_guardian: {
                 text: "Wierny Opiekun",
                 description: "Zostałeś honorowym członkiem rodziny Lisa, zyskując nie tylko zaufanie, ale i prawdziwą miłość rodzinną.",
-                background: "endings/faithful_guardian.jpg",
+                background: "./images/endings/faithful_guardian.jpg",
                 type: "happy"
             },
             neutral_path: {
@@ -411,7 +513,7 @@
             ending_mushroom_collection: {
                 text: "Grzyb w Kolekcji",
                 description: "Dołączyłeś do tajemniczej kolekcji grzybów Pana Lisa. Twoja historia staje się przestrogą dla przyszłych opiekunów.",
-                background: "endings/mushroom_collection.jpg",
+                background: "./images/endings/mushroom_collection.jpg",
                 type: "tragic"
             },
             escape_ending: {
@@ -614,116 +716,195 @@
             }
         };
 
+        // Add mobile detection
+        function isMobileDevice() {
+            return (window.matchMedia("(max-width: 768px)").matches && 
+                    window.matchMedia("(pointer: coarse)").matches);
+        }
+
+        // Modify updateGame function
+        const originalUpdateGame = updateGame;
         function updateGame(state) {
-            if (gameStates[state].type === 'ending') {
-                // Create ending screen
-                const endingScreen = document.createElement('div');
-                endingScreen.className = 'ending-screen';
-                endingScreen.style.backgroundImage = `url(${gameStates[state].background})`;
-
-                const title = document.createElement('h1');
-                title.className = 'ending-title';
-                title.textContent = gameStates[state].text;
-
-                const description = document.createElement('p');
-                description.className = 'ending-description';
-                description.textContent = gameStates[state].description;
-
-                const playAgain = document.createElement('button');
-                playAgain.className = 'play-again-button';
-                playAgain.textContent = 'Zagraj ponownie';
-                playAgain.onclick = () => {
-                    document.body.removeChild(endingScreen);
-                    updateGame('start');
-                };
-
-                endingScreen.appendChild(title);
-                endingScreen.appendChild(description);
-                endingScreen.appendChild(playAgain);
-                document.body.appendChild(endingScreen);
-                return;
+            if (isMobileDevice()) {
+                document.body.classList.add('mobile-device');
             }
+            
+            originalUpdateGame(state);
 
-            const container = document.querySelector('.game-container');
-            const storyText = document.querySelector('.story-text');
-            
-            // Reset classes
-            container.className = 'game-container';
-            
-            // Add scene-specific class
-            if (gameStates[state].sceneType) {
-                storyText.className = `story-text ${gameStates[state].sceneType}`;
+            // Add touch-specific handlers for mobile
+            if (isMobileDevice()) {
+                const buttons = document.querySelectorAll('.choice-button');
+                buttons.forEach(button => {
+                    button.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        this.style.transform = 'scale(0.98)';
+                    });
+                    
+                    button.addEventListener('touchend', function(e) {
+                        e.preventDefault();
+                        this.style.transform = 'scale(1)';
+                    });
+                });
             }
+        }
 
-            // Add ending-specific class if applicable
-            if (state.includes('happy') || state === 'trusted_guardian') {
-                container.classList.add('happy-ending');
-            } else if (state.includes('tragic') || state === 'game_over') {
-                container.classList.add('tragic-ending');
-            } else if (state.includes('neutral') || state === 'polite_stranger') {
-                container.classList.add('neutral-ending');
+        // Prevent double-tap zoom on mobile
+        document.addEventListener('touchend', function(e) {
+            if (isMobileDevice()) {
+                e.preventDefault();
             }
+        }, { passive: false });
 
-            document.getElementById('storyText').textContent = gameStates[state].text;
-            const buttonContainer = document.getElementById('choiceButtons');
-            buttonContainer.innerHTML = '';
-            
-            gameStates[state].choices.forEach(choice => {
-                const button = document.createElement('button');
-                button.className = 'choice-button';
-                button.textContent = choice.text;
-                button.onclick = () => updateGame(choice.nextState);
-                buttonContainer.appendChild(button);
+        // Handle orientation changes on mobile
+        if (isMobileDevice()) {
+            window.addEventListener('orientationchange', function() {
+                setTimeout(() => {
+                    window.scrollTo(0, 0);
+                    document.documentElement.style.height = '100vh';
+                }, 100);
             });
+        }
 
-            // Update background based on scene type
-            const sceneBackground = document.getElementById('scene-background');
-            sceneBackground.className = 'scene-overlay';
+        function updateGame(state) {
+            // Create transition overlay if it doesn't exist
+            let transition = document.querySelector('.scene-transition');
+            if (!transition) {
+                transition = document.createElement('div');
+                transition.className = 'scene-transition';
+                document.body.appendChild(transition);
+            }
+
+            // Add transition effect
+            transition.classList.add('active');
             
-            switch(gameStates[state].sceneType) {
-                case 'forest-scene':
-                    sceneBackground.classList.add('forest-bg');
-                    if (state.includes('rain')) {
-                        sceneBackground.innerHTML = '<div class="rain"></div>';
-                    }
-                    break;
-                case 'house-scene':
-                    sceneBackground.classList.add('house-bg');
-                    break;
-                case 'night-scene':
-                    sceneBackground.classList.add('night-bg');
-                    break;
-                // Add more scene types...
-            }
+            // Determine transition style based on next scene
+            const nextSceneType = gameStates[state].sceneType;
+            transition.classList.forEach(className => {
+                if (className.startsWith('transition-')) {
+                    transition.classList.remove(className);
+                }
+            });
+            transition.classList.add(`transition-${nextSceneType.split('-')[0]}`);
 
-            // Update scene effects
+            // Update scene after transition
+            setTimeout(() => {
+                if (gameStates[state].type === 'ending') {
+                    // Create ending screen
+                    const endingScreen = document.createElement('div');
+                    endingScreen.className = 'ending-screen';
+                    endingScreen.style.backgroundImage = `url(${gameStates[state].background})`;
+
+                    const title = document.createElement('h1');
+                    title.className = 'ending-title';
+                    title.textContent = gameStates[state].text;
+
+                    const description = document.createElement('p');
+                    description.className = 'ending-description';
+                    description.textContent = gameStates[state].description;
+
+                    const playAgain = document.createElement('button');
+                    playAgain.className = 'play-again-button';
+                    playAgain.textContent = 'Zagraj ponownie';
+                    playAgain.onclick = () => {
+                        document.body.removeChild(endingScreen);
+                        updateGame('start');
+                    };
+
+                    endingScreen.appendChild(title);
+                    endingScreen.appendChild(description);
+                    endingScreen.appendChild(playAgain);
+                    document.body.appendChild(endingScreen);
+                    return;
+                }
+
+                const container = document.querySelector('.game-container');
+                const storyText = document.querySelector('.story-text');
+                
+                // Reset classes
+                container.className = 'game-container';
+                
+                // Add scene-specific class
+                if (gameStates[state].sceneType) {
+                    storyText.className = `story-text ${gameStates[state].sceneType}`;
+                }
+
+                // Add ending-specific class if applicable
+                if (state.includes('happy') || state === 'trusted_guardian') {
+                    container.classList.add('happy-ending');
+                } else if (state.includes('tragic') || state === 'game_over') {
+                    container.classList.add('tragic-ending');
+                } else if (state.includes('neutral') || state === 'polite_stranger') {
+                    container.classList.add('neutral-ending');
+                }
+
+                document.getElementById('storyText').textContent = gameStates[state].text;
+                const buttonContainer = document.getElementById('choiceButtons');
+                buttonContainer.innerHTML = '';
+                
+                gameStates[state].choices.forEach(choice => {
+                    const button = document.createElement('button');
+                    button.className = 'choice-button';
+                    button.textContent = choice.text;
+                    button.onclick = () => updateGame(choice.nextState);
+                    buttonContainer.appendChild(button);
+                });
+
+                // Update background based on scene type
+                const sceneBackground = document.getElementById('scene-background');
+                sceneBackground.className = 'scene-overlay';
+                
+                switch(gameStates[state].sceneType) {
+                    case 'forest-scene':
+                        sceneBackground.classList.add('forest-bg');
+                        if (state.includes('rain')) {
+                            sceneBackground.innerHTML = '<div class="rain"></div>';
+                        }
+                        break;
+                    case 'house-scene':
+                        sceneBackground.classList.add('house-bg');
+                        break;
+                    case 'night-scene':
+                        sceneBackground.classList.add('night-bg');
+                        break;
+                    // Add more scene types...
+                }
+
+                // Add scene change animation to container
+                container.classList.add('changing-scene');
+                
+                // Remove transition and animation classes after completion
+                setTimeout(() => {
+                    transition.classList.remove('active');
+                    container.classList.remove('changing-scene');
+                }, 1000);
+            }, 500);
+
+            // Update weather effects with transition
             const weatherEffects = document.getElementById('weather-effects');
-            weatherEffects.innerHTML = '';
-
-            // Add appropriate effects based on scene type
-            switch(gameStates[state].sceneType) {
-                case 'forest-scene':
-                    sceneBackground.classList.add('forest-bg');
-                    if (state.includes('rain')) {
-                        weatherEffects.innerHTML = '<div class="rain"></div><div class="fog"></div>';
-                    }
-                    break;
-                case 'house-scene':
-                case 'cozy-scene':
-                    sceneBackground.classList.add('house-bg');
-                    weatherEffects.innerHTML = '<div class="firelight"></div>';
-                    break;
-                case 'night-scene':
-                    sceneBackground.classList.add('night-bg');
-                    weatherEffects.innerHTML = '<div class="moonlight"></div>';
-                    break;
-                case 'danger-scene':
-                    sceneBackground.classList.add('danger-bg');
-                    if (state.includes('escape')) {
-                        weatherEffects.innerHTML = '<div class="rain"></div><div class="fog"></div>';
-                    }
-                    break;
-            }
+            weatherEffects.style.opacity = '0';
+            setTimeout(() => {
+                weatherEffects.innerHTML = '';
+                switch(gameStates[state].sceneType) {
+                    case 'forest-scene':
+                        if (state.includes('rain')) {
+                            weatherEffects.innerHTML = '<div class="rain"></div><div class="fog"></div>';
+                        }
+                        break;
+                    case 'house-scene':
+                    case 'cozy-scene':
+                        weatherEffects.innerHTML = '<div class="firelight"></div>';
+                        break;
+                    case 'night-scene':
+                        weatherEffects.innerHTML = '<div class="moonlight"></div>';
+                        break;
+                    case 'danger-scene':
+                        if (state.includes('escape')) {
+                            weatherEffects.innerHTML = '<div class="rain"></div><div class="fog"></div>';
+                        }
+                        break;
+                }
+                weatherEffects.style.opacity = '1';
+            }, 500);
         }
 
         // Start the game
