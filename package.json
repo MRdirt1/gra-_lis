@@ -1,6 +1,17 @@
 {
+  "name": "gra-_lis",
+  "version": "1.0.0",
+  "description": "A choose-your-own-adventure game featuring Pan Lis.",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step required'",
+    "start": "serve ."
+  },
   "dependencies": {
-    /* ...existing dependencies... */
-    "@sentry/netlify-build-plugin": "^1.1.1"
-  }
+    "@sentry/netlify-build-plugin": "^1.1.1",
+    "serve": "^14.0.1"
+  },
+  "devDependencies": {},
+  "author": "Your Name",
+  "license": "MIT"
 }
