@@ -44,7 +44,7 @@
         .forest-bg {
             background: 
                 linear-gradient(rgba(45, 90, 39, 0.7), rgba(0, 0, 0, 0.4)),
-                url('./images/backgrounds/forest-bg.jpg') center/cover fixed;
+                url('../images/backgrounds/forest-bg.jpg') center/cover fixed;
         }
 
         .house-bg {
@@ -95,6 +95,8 @@
             background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.95);
         }
 
         .button-container {
@@ -117,6 +119,33 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-button:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, .5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .choice-button:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0, 0); opacity: .5; }
+            100% { transform: scale(20, 20); opacity: 0; }
         }
 
         .choice-button:hover {
@@ -189,6 +218,10 @@
             .choice-button {
                 min-width: 150px;
             }
+
+            .forest-bg, .house-bg, .night-bg, .danger-bg {
+                background-attachment: scroll !important;
+            }
         }
 
         /* Add new styles for ending screens */
@@ -207,6 +240,8 @@
             background-position: center;
             color: white;
             z-index: 100;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
         }
 
         .ending-title {
@@ -718,19 +753,49 @@
 
         // Add mobile detection
         function isMobileDevice() {
-            return (window.matchMedia("(max-width: 768px)").matches && 
-                    window.matchMedia("(pointer: coarse)").matches);
+            return (
+                navigator.maxTouchPoints > 0 || 
+                navigator.msMaxTouchPoints > 0 ||
+                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            );
         }
 
         // Modify updateGame function
-        const originalUpdateGame = updateGame;
         function updateGame(state) {
+            if (!gameStates[state]) {
+                console.error('Invalid state:', state);
+                return;
+            }
+
+            // Create transition effect
+            const transition = document.createElement('div');
+            transition.className = 'scene-transition';
+            document.body.appendChild(transition);
+
+            // Fade out
+            requestAnimationFrame(() => {
+                transition.style.opacity = '1';
+                
+                setTimeout(() => {
+                    updateGameContent(state);
+                    
+                    // Fade in
+                    requestAnimationFrame(() => {
+                        transition.style.opacity = '0';
+                        setTimeout(() => {
+                            document.body.removeChild(transition);
+                        }, 500);
+                    });
+                }, 500);
+            });
+        }
+
+        // Separate content update function
+        function updateGameContent(state) {
             if (isMobileDevice()) {
                 document.body.classList.add('mobile-device');
             }
             
-            originalUpdateGame(state);
-
             // Add touch-specific handlers for mobile
             if (isMobileDevice()) {
                 const buttons = document.querySelectorAll('.choice-button');
@@ -746,26 +811,24 @@
                     });
                 });
             }
-        }
 
-        // Prevent double-tap zoom on mobile
-        document.addEventListener('touchend', function(e) {
+            // Prevent double-tap zoom on mobile
+            document.addEventListener('touchend', function(e) {
+                if (isMobileDevice()) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // Handle orientation changes on mobile
             if (isMobileDevice()) {
-                e.preventDefault();
+                window.addEventListener('orientationchange', function() {
+                    setTimeout(() => {
+                        window.scrollTo(0, 0);
+                        document.documentElement.style.height = '100vh';
+                    }, 100);
+                });
             }
-        }, { passive: false });
 
-        // Handle orientation changes on mobile
-        if (isMobileDevice()) {
-            window.addEventListener('orientationchange', function() {
-                setTimeout(() => {
-                    window.scrollTo(0, 0);
-                    document.documentElement.style.height = '100vh';
-                }, 100);
-            });
-        }
-
-        function updateGame(state) {
             // Create transition overlay if it doesn't exist
             let transition = document.querySelector('.scene-transition');
             if (!transition) {
@@ -907,8 +970,45 @@
             }, 500);
         }
 
-        // Start the game
-        updateGame('start');
+        // Add error handling
+        window.onerror = function(msg, url, line) {
+            console.error('Error: ', msg, '\nURL: ', url, '\nLine:', line);
+            alert('Wystąpił błąd. Spróbuj odświeżyć stronę.');
+            return false;
+        };
+
+        // Add preload for images
+        function preloadImages() {
+            const images = [
+                './images/backgrounds/forest-bg.jpg',
+                './images/backgrounds/cozy-house.jpg',
+                './images/backgrounds/night-forest.jpg',
+                './images/backgrounds/danger-scene.jpg',
+                './images/endings/faithful_guardian.jpg',
+                './images/endings/mushroom_collection.jpg',
+                './images/endings/neutral_ending.jpg'
+            ];
+            
+            images.forEach(src => {
+                const img = new Image();
+                img.src = src;
+                img.onerror = () => console.error(`Failed to load image: ${src}`);
+            });
+        }
+
+        // Add image loading error handling
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'IMG') {
+                console.error('Image load failed:', e.target.src);
+                e.target.src = './images/backgrounds/default-bg.jpg';
+            }
+        }, true);
+
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', () => {
+            preloadImages();
+            updateGame('start');
+        });
     </script>
 </body>
 </html>

@@ -21,13 +21,13 @@
 }
 
 @keyframes fog {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
 }
 
 @keyframes firelight {
-    from { opacity: 0.3; }
-    to { opacity: 0.6; }
+    from { opacity: 0.3; filter: brightness(1); }
+    to { opacity: 0.6; filter: brightness(1.2); }
 }
 
 .moonlight {
@@ -38,6 +38,14 @@
     height: 100%;
     background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.2), transparent 70%);
     pointer-events: none;
+}
+
+/* Fix performance issues */
+.fog, .firelight, .moonlight {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 /* Mobile-specific effect adjustments */
@@ -53,5 +61,16 @@
 
     .moonlight {
         background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.15), transparent 60%);
+    }
+}
+
+/* Better mobile performance */
+@media (max-width: 768px) {
+    .fog {
+        animation-duration: 30s;
+    }
+    
+    .firelight {
+        animation-duration: 6s;
     }
 }
