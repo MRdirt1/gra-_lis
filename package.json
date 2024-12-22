@@ -4,7 +4,7 @@
   "description": "A choose-your-own-adventure game featuring Pan Lis.",
   "main": "index.html",
   "scripts": {
-    "build": "echo 'No build step required'",
+    "build": "echo 'Starting build...' && echo 'No build step required' && echo 'Build completed successfully'",
     "start": "serve ."
   },
   "dependencies": {
