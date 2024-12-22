@@ -385,7 +385,7 @@
         <div class="button-container" id="choiceButtons"></div>
     </div>
 
-    <script>
+   <script>
         const gameStates = {
             start: {
                 text: "Witaj w grze Pan Lis! Jesteś zmęczonym wędrowcem, który zbierał grzyby w lesie. Pogoda się pogarsza...",
@@ -396,7 +396,7 @@
             },
             forest_intro: {
                 text: "Ciemne chmury zbierają się nad lasem. Twój koszyk jest pełen grzybów, ale zaczynasz tracić orientację...",
-                choices: [
+                choices: [ 
                     { text: "Spróbuj odnaleźć drogę", nextState: "lost_path" },
                     { text: "Szukaj schronienia", nextState: "find_shelter" }
                 ],
@@ -751,7 +751,6 @@
             }
         };
 
-        // Add mobile detection
         function isMobileDevice() {
             return (
                 navigator.maxTouchPoints > 0 || 
@@ -760,26 +759,22 @@
             );
         }
 
-        // Modify updateGame function
         function updateGame(state) {
             if (!gameStates[state]) {
                 console.error('Invalid state:', state);
                 return;
             }
 
-            // Create transition effect
             const transition = document.createElement('div');
             transition.className = 'scene-transition';
             document.body.appendChild(transition);
 
-            // Fade out
             requestAnimationFrame(() => {
                 transition.style.opacity = '1';
                 
                 setTimeout(() => {
                     updateGameContent(state);
                     
-                    // Fade in
                     requestAnimationFrame(() => {
                         transition.style.opacity = '0';
                         setTimeout(() => {
@@ -790,12 +785,11 @@
             });
         }
 
-        // Separate content update function
         function updateGameContent(state) {
             if (isMobileDevice()) {
                 document.body.classList.add('mobile-device');
             }
-            
+
             // Add touch-specific handlers for mobile
             if (isMobileDevice()) {
                 const buttons = document.querySelectorAll('.choice-button');
@@ -840,7 +834,6 @@
             // Add transition effect
             transition.classList.add('active');
             
-            // Determine transition style based on next scene
             const nextSceneType = gameStates[state].sceneType;
             transition.classList.forEach(className => {
                 if (className.startsWith('transition-')) {
@@ -852,7 +845,6 @@
             // Update scene after transition
             setTimeout(() => {
                 if (gameStates[state].type === 'ending') {
-                    // Create ending screen
                     const endingScreen = document.createElement('div');
                     endingScreen.className = 'ending-screen';
                     endingScreen.style.backgroundImage = `url(${gameStates[state].background})`;
@@ -909,6 +901,7 @@
                     button.className = 'choice-button';
                     button.textContent = choice.text;
                     button.onclick = () => updateGame(choice.nextState);
+                    button.addEventListener('touchend', () => updateGame(choice.nextState));
                     buttonContainer.appendChild(button);
                 });
 
@@ -973,7 +966,7 @@
         // Add error handling
         window.onerror = function(msg, url, line) {
             console.error('Error: ', msg, '\nURL: ', url, '\nLine:', line);
-            alert('Spróbuj odświeżyć stronę i zacznij od nowa')
+            alert('Wystąpił błąd. Spróbuj odświeżyć stronę.');
             return false;
         };
 
