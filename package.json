@@ -8,7 +8,8 @@
     "start": "serve ."
   },
   "dependencies": {
-    "serve": "^14.0.1"
+    "serve": "^14.0.1",
+    "@sentry/netlify-build-plugin": "^1.0.0"
   },
   "devDependencies": {},
   "author": "Your Name",
